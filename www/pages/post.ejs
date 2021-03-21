@@ -1,34 +1,45 @@
 <!-- Importer le header en EJS -->
 <%- include('../statics/header') -%>
 
-<main>
-    <h2>Page protégée</h2>
-
-    <h3>Article</h3>
-    
-    <p>
-        <%- data.data.post.headline %>
-    </p>
-    <p>
-        <%- data.data.post.body %>
-    </p>
-
-    <h4>Liste des commentaires</h4>
-    <% if( data.data.post.comments.length > 0 ) { %>
-        <% for(let item of data.data.post.comments) { %>
-            <li>
-                <p><%- item.text %></p>
-            </li>
-        <% } %> 
-    <% } else { %>
-        <p>aucun commentaire</p>
-    <% } %>
-
-    <section>
-        <%- include('../components/form-comment', {postId: data.data.post._id}) -%>
-    </section>
-
+<main class="container">
+    <%- include('../statics/intro') -%>
+    <div class="row justify-content-center">
+        <div class="col-10">
+            <h2>Article : </h2>
+        </div>
+    </div>
+    <div class="row justify-content-center">
+        <div class="col-10">
+            <div class="jumbotron">
+                <h3 class="display-4">
+                    <%- data.data.post.headline %>
+                </h3>
+                <p class="lead">
+                    <%- data.data.post.body %>
+                </p>
+                <span class="glyphicon glyphicon-heart like_button"></span>
+                <hr class="my-4">
+                <h4 class="lead">Commentaires: </h4>
+                <% if( data.data.post.comments.length > 0 ) { %>
+                <ul class="list-group comments">
+                    <% for(let item of data.data.post.comments) { %>
+                    <li class="list-group-item">
+                        <p><%- item.text %></p>
+                        <p>Par : <%- item.author.givenName %></p>
+                    </li>
+                    <% } %>
+                </ul>
+                <% } else { %>
+                <p>aucun commentaire</p>
+                <% } %>
+                <hr class="my-4">
+                <div>
+                    <%- include('../components/form-comment', {postId: data.data.post._id}) -%>
+                </div>
+            </div>
+        </div>
+    </div>
 </main>
 
 <!-- Importer le footer en EJS -->
-<%- include('../statics/footer') -%>  
+<%- include('../statics/footer') -%>

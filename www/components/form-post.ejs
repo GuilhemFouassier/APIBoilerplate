@@ -3,13 +3,14 @@
 -->
 
 <form action="/post" method="POST">
-
-    <label for="headline">Titre</label>
-    <input type="text" name="headline" required minlength="2" value="Mon super titre">
-
-    <label for="body">Contenu</label>
-    <textarea name="body" required minlength="2">Mon super contenu</textarea>
-
-    <button type="submit">Ajouter</button>
-
+    <div class="form-group">
+        <label for="headline">Titre</label>
+        <input class="form-control" type="text" name="headline" required minlength="2" value="Mon super titre">
+    </div>
+    <div class="form-group">
+        <label for="body">Contenu</label>
+        <textarea class="form-control" name="body" required minlength="2">Mon super contenu</textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">Ajouter</button>
+    
 </form>

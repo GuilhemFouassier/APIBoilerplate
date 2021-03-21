@@ -79,16 +79,25 @@ Routes definition
                 }
             })
 
-            // [BACKOFFICE] Render GET vue
-                this.router.get('/:endpoint/:id', async (req, res) => {
+            // [BACKOFFICE] Render GET detail vue
+            this.router.get('/:endpoint', async (req, res) => {
+                if(req.params.endpoint == "post"){
+                    await Controllers[req.params.endpoint].readAll()
+                    .then(apiResponse => renderSuccessVue(`pages/${req.params.endpoint}List`, req, res, apiResponse, 'Request succeed', false))
+                    .catch(apiError => renderErrorVue(`pages/${req.params.endpoint}List`, req, res, apiError, 'Request failed'))
+                }else{
+                    renderSuccessVue('index', req, res)
+                }
+            })
 
-                    let data = {};
-
-                    await Controllers[req.params.endpoint].readOne(req.params.id)
-                        .then( post => data.post = post )
-                        .catch( () => renderErrorVue('post_error', req, res, null, 'Request failed'));
-                    renderSuccessVue(`pages/${req.params.endpoint}`, req, res, data, 'Request succeed', false)
-                })
+            // [BACKOFFICE] Render GET detail vue
+            this.router.get('/:endpoint/:id', async (req, res) => {
+                let data = {};
+                await Controllers[req.params.endpoint].readOne(req.params.id)
+                    .then( post => data.post = post )
+                    .catch( () => renderErrorVue('post_error', req, res, null, 'Request failed'));
+                renderSuccessVue(`pages/${req.params.endpoint}`, req, res, data, 'Request succeed', false)
+            })
 
         }
 

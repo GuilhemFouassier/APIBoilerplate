@@ -3,10 +3,11 @@
 -->
 
 <form action="/comment" method="POST">
-
-    <label for="text">text</label>
-    <input type="text" name="text" required minlength="2" value="Mon super commentaire">
     <input type="text" name="parentItem" value="<%= postId %>" style="display: none;">
-    <button type="submit">Commenter</button>
+    <div class="form-group">
+    <label for="text">Ajouter un commentaire: </label>
+    <input class="form-control" type="text" name="text" required minlength="2" value="Mon super commentaire">
+    </div>
+    <button type="submit" class="btn btn-primary btn-sm">Commenter</button>
 
 </form>

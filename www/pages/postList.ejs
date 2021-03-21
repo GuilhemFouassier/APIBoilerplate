@@ -1,0 +1,32 @@
+<!-- Importer le header en EJS -->
+<%- include('../statics/header') -%>
+
+<main class="container">
+    <%- include('../statics/intro') -%>  
+    <div class="row">
+        <div class="col-4">
+            <div class="jumbotron">
+                <h2 class="display-4">Ajouter un article</h2>
+                <%- include('../components/form-post') -%>
+            </div>
+        </div>
+        <div class="col-8">
+            <h2>Liste des articles</h2>
+            <% if( data.data.length) {%>
+            <ul class="list-group">
+                <% for(let item of data.data) { %>
+                    <li class="jumbotron">
+                        <h3 class="lead"><%- item.headline %></h4>
+                        <a href="/post/<%- item._id %>" class="btn btn-primary">Voir plus</a>
+                    </li>
+                <% } %>
+            </ul>
+            <%} else {%>
+                <p>No post</p>
+            <% } %>
+        </div>
+    </div>
+</main>
+
+<!-- Importer le footer en EJS -->
+<%- include('../statics/footer') -%>  
