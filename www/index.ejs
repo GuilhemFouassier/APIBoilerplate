@@ -1,0 +1,27 @@
+<!-- Importer le header en EJS -->
+<%- include('statics/header') -%>
+
+<main>
+    <h2>Page protégée</h2>
+
+    <h3>Ajouter un article</h3>
+    <%- include('components/form-post') -%>
+
+        <h3>Liste des articles</h3>
+        <% if( data.data.length) {%>
+        <ul>
+            <% for(let item of data.data) { %>
+                <li>
+                    <h4><%- item.headline %></h4>
+                    <a href="/post/<%- item._id %>">Voir plus</a>
+                </li>
+            <% } %>
+        </ul>
+        <%} else {%>
+            <p>No post</p>
+        <% } %>
+    
+</main>
+
+<!-- Importer le footer en EJS -->
+<%- include('statics/footer') -%>  

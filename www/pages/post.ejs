@@ -1,0 +1,34 @@
+<!-- Importer le header en EJS -->
+<%- include('../statics/header') -%>
+
+<main>
+    <h2>Page protégée</h2>
+
+    <h3>Article</h3>
+    
+    <p>
+        <%- data.data.post.headline %>
+    </p>
+    <p>
+        <%- data.data.post.body %>
+    </p>
+
+    <h4>Liste des commentaires</h4>
+    <% if( data.data.post.comments.length > 0 ) { %>
+        <% for(let item of data.data.post.comments) { %>
+            <li>
+                <p><%- item.text %></p>
+            </li>
+        <% } %> 
+    <% } else { %>
+        <p>aucun commentaire</p>
+    <% } %>
+
+    <section>
+        <%- include('../components/form-comment', {postId: data.data.post._id}) -%>
+    </section>
+
+</main>
+
+<!-- Importer le footer en EJS -->
+<%- include('../statics/footer') -%>  

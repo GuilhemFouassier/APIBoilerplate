@@ -1,0 +1,12 @@
+<!-- 
+    Créer le formulaire de commment
+-->
+
+<form action="/comment" method="POST">
+
+    <label for="text">text</label>
+    <input type="text" name="text" required minlength="2" value="Mon super commentaire">
+    <input type="text" name="parentItem" value="<%= postId %>" style="display: none;">
+    <button type="submit">Commenter</button>
+
+</form>
