@@ -20,10 +20,14 @@ const MySchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'user'  
     },
-    parentItem: {
+    posts: {
         type: Schema.Types.ObjectId,
         ref: 'post'  
     },
+    likes: [{
+        type: Schema.Types.ObjectId,
+        ref: 'like'  
+    }],
 
     // Définir une valeur par défaut
     creationDate: { type: Date, default: new Date() },

@@ -13,17 +13,19 @@ const MySchema = new Schema({
     '@context': { type: String, default: 'http://schema.org' },
     '@type': { type: String, default: 'LikeAction' },
 
-    result: Boolean,
-
     // Associer le profil utilisateur
     author: {
         type: Schema.Types.ObjectId,
         ref: 'user'  
     },
-    parentItem: {
+    posts: {
         type: Schema.Types.ObjectId,
         ref: 'post'  
     },
+    comments: {
+        type: Schema.Types.ObjectId,
+        ref: 'comment'  
+    }
 })
 //
 

@@ -1,6 +1,7 @@
 /* 
 Imports
 */
+const { models, Model } = require('mongoose');
 const Models = require('../models/index');
 //
 
@@ -8,20 +9,34 @@ const Models = require('../models/index');
 CRUD methods
 */
     const createOne = req => {
-        return new Promise( (resolve, reject) => {
-            Models.like.create( req.body )
-            .then( data => {
-                resolve(data);
-                Models.post.findById( data.parentItem )
-                .then( post => {
-                    post.likes.push(data._id);
-                    post.save()
-                    .then( updatedPost => resolve(updatedPost) )
-                    .catch( updateError => reject(updateError) )
+        return new Promise((resolve, reject) => {
+            Models.like.create(req.body)
+                .then(data => {
+                    resolve(data);
+                    // Si on possède un champs post
+                    if (data.posts != null) {
+                        Models[req.query.model].findById(data.posts)
+                            .then(post => {
+                                post.likes.push(data._id);
+                                post.save()
+                                    .then(updatedPost => resolve(updatedPost))
+                                    .catch(updateError => reject(updateError))
+                            })
+                            .catch(err => reject(err))
+                    } else {
+                        // Sinon on possède un champs comment
+                        Models[req.query.model].findById(data.comments)
+                            .then(comments => {
+                                comments.likes.push(data._id);
+                                comments.save()
+                                    .then(updatedPost => resolve(updatedPost))
+                                    .catch(updateError => reject(updateError))
+                            })
+                            .catch(err => reject(err))
+                    }
+
                 })
-            .catch( err => reject(err) )
-            } )
-            .catch( err => reject(err) )
+                .catch(err => reject(err))
         })
     }
  
@@ -52,49 +67,27 @@ CRUD methods
         })
     }
 
-    const updateOne = req => {
+    const deleteOne = data => {
         return new Promise( (resolve, reject) => {
-            // Get post by ID
-            Models.like.findById( req.params.id )
-            .then( like => {
-                // Update object
-                like.result = req.body.bool;
-
-                // TODO: Check author
-                /* if( post.author !== req.user._id ){ return reject('User not authorized') }
-                else{ } */
-
-                // Save post changes
-                like.save()
-                .then( updatedPost => resolve(updatedPost) )
-                .catch( updateError => reject(updateError) )
-            })
-            .catch( err => reject(err) )
-        })
-    }
-
-    const deleteOne = req => {
-        return new Promise( (resolve, reject) => {
-             // Delete object
-             Models.like.findByIdAndDelete( req.params.id, (err, deleted) => {
-                if( err ){ return reject(err) }
-                else{ return resolve(deleted) };
-            })
-            
-            // Get post by ID
-            /* Models.post.findById( req.params.id )
-            .then( post => {
-                // TODO: Check author
-                if( post.author !== req.user._id ){ return reject('User not authorized') }
-                else{
-                    // Delete object
-                    Models.post.findByIdAndDelete( req.params.id, (err, deleted) => {
-                        if( err ){ return reject(err) }
-                        else{ return resolve(deleted) };
-                    })
+             // Get comment by ID
+             Models.like.findByIdAndDelete( data._id, (err, deleted) => {
+                if( err ){ 
+                    return reject(err)
                 }
-            })
-            .catch( err => reject(err) ); */
+                else{
+                    Models.post.findById(data.posts)
+                    .then( post => {
+                        // Delete Comment Id
+                        post.likes.pull(data._id) ;
+                        // Save post changes
+                        post.save()
+                        .then( updatedPost => resolve(updatedPost) )
+                        .catch( updateError => reject(updateError) )
+                    })
+                    .catch( err => reject(err) )
+                    return resolve(deleted) 
+                    }
+                })
         });
     }
 //
@@ -106,7 +99,6 @@ Export controller methods
         readAll,
         readOne,
         createOne,
-        updateOne,
         deleteOne
     }
 //

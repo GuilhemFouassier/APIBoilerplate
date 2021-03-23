@@ -1,7 +1,8 @@
 /* 
 Imports
 */
-    const Models = require('../models/index');
+    const { comment } = require('../models/index');
+const Models = require('../models/index');
 //
 
 /*  
@@ -38,6 +39,7 @@ CRUD methods
                 populate: { path: 'author' }
 
             })
+            .populate('likes')
             .exec( (err, data) => {
                 if( err ){ return reject(err) }
                 else{ return resolve(data) }
@@ -55,14 +57,13 @@ CRUD methods
                 post.body = req.body.body;
                 post.dateModified = new Date();
 
-                // TODO: Check author
-                /* if( post.author !== req.user._id ){ return reject('User not authorized') }
-                else{ } */
-
-                // Save post changes
-                post.save()
-                .then( updatedPost => resolve(updatedPost) )
-                .catch( updateError => reject(updateError) )
+                if( `${req.user._id}` !== `${post.author._id}` ){ return reject('User not authorized') }
+                else{ 
+                    // Save post changes
+                    post.save()
+                    .then( updatedPost => resolve(updatedPost) )
+                    .catch( updateError => reject(updateError) )
+                }
             })
             .catch( err => reject(err) )
         })
@@ -70,26 +71,56 @@ CRUD methods
 
     const deleteOne = req => {
         return new Promise( (resolve, reject) => {
-             // Delete object
-             Models.post.findByIdAndDelete( req.params.id, (err, deleted) => {
-                if( err ){ return reject(err) }
-                else{ return resolve(deleted) };
-            })
-            
-            // Get post by ID
-            /* Models.post.findById( req.params.id )
+            Models.post.findById(req.params.id)
+            .populate('author', [ '-password' ])
             .then( post => {
-                // TODO: Check author
-                if( post.author !== req.user._id ){ return reject('User not authorized') }
+                if( `${req.user._id}` !== `${post.author._id}` ){
+                    return reject('User not authorized') 
+                }
                 else{
-                    // Delete object
                     Models.post.findByIdAndDelete( req.params.id, (err, deleted) => {
-                        if( err ){ return reject(err) }
-                        else{ return resolve(deleted) };
-                    })
+                    if( err ){ 
+                        return reject(err)
+                    }
+                    else{
+                        Models.comment.find({posts : req.params.id})
+                        .then(comments => {
+                            comments.forEach( data => {
+                                Models.like.deleteMany({comments : data._id}, (err, deleted) => {
+                                    if( err ){ 
+                                        return reject(err) 
+                                    }
+                                    else{
+                                        return resolve(deleted) 
+                                    }
+                                })
+                            })
+                            Models.comment.deleteMany({posts : req.params.id}, (err, deleted) => {
+                                if( err ){ 
+                                    return reject(err) 
+                                }
+                                else{
+                                    return resolve(deleted) 
+                                }
+                            })
+                        })
+                        .catch(err => reject(err))
+                        Models.like.deleteMany({posts : req.params.id}, (err, deleted) => {
+                            if( err ){ 
+                                return reject(err) 
+                            }
+                            else{
+                                return resolve(deleted) 
+                            }
+                        })
+                        return resolve(deleted) 
+                    }
+                })
                 }
             })
-            .catch( err => reject(err) ); */
+            .catch( err => {
+                reject(err)
+            } );
         });
     }
 //

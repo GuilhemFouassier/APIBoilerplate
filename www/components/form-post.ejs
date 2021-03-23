@@ -2,14 +2,14 @@
     Créer le formulaire de connexion
 -->
 
-<form action="/post" method="POST">
+<form action="/post/<%= data._id %>" method="POST">
     <div class="form-group">
         <label for="headline">Titre</label>
-        <input class="form-control" type="text" name="headline" required minlength="2" value="Mon super titre">
+        <input class="form-control" type="text" name="headline" required minlength="2" value="<%= data.headline %>">
     </div>
     <div class="form-group">
         <label for="body">Contenu</label>
-        <textarea class="form-control" name="body" required minlength="2">Mon super contenu</textarea>
+        <textarea class="form-control" name="body" required minlength="2"><%= data.body %></textarea>
     </div>
     <button type="submit" class="btn btn-primary">Ajouter</button>
     

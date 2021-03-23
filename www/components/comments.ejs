@@ -1,0 +1,17 @@
+<ul class="list-group comments">
+    <% for(let item of datas) { %>
+    <li class="list-group-item">
+        <p><%- item.text %></p>
+        <a href="/delete/comment/<%- item._id %>" class="btn btn-danger trash btn-sm"><i class="bi bi-trash"></i></a>
+        <div>         
+            <%- include('form-like', {id: item._id, model : 'comment'}) -%>
+            <% if( item.likes.length > 0 ) { %>
+                <span class="badge badge-primary badge-pill"> <%- item.likes.length %></span>
+            <% } else{ %>
+                <span class="badge badge-primary badge-pill"> 0</span>
+            <% } %>
+        </div>
+        <p>Par : <%- item.author.givenName %></p>
+    </li>
+    <% } %>
+</ul>

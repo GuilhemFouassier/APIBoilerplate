@@ -7,28 +7,32 @@
         <div class="col-10">
             <h2>Article : </h2>
         </div>
-    </div>
+    </div> 
     <div class="row justify-content-center">
         <div class="col-10">
             <div class="jumbotron">
                 <h3 class="display-4">
                     <%- data.data.post.headline %>
+                    <a href="/delete/post/<%- data.data.post._id %>" class="btn btn-danger">Delete</a>
+                    <a href="/edit/post/<%- data.data.post._id %>" class="btn btn-warning">Edit</a>
                 </h3>
+                <p>Par : <%- data.data.post.author.givenName %> - <%- data.data.post.creationDate %></p>
                 <p class="lead">
                     <%- data.data.post.body %>
                 </p>
-                <span class="glyphicon glyphicon-heart like_button"></span>
+                <div>
+                    
+                    <%- include('../components/form-like', {id: data.data.post._id, model : 'post'}) -%>
+                    <% if( data.data.post.likes.length > 0 ) { %>
+                        <span class="badge badge-primary badge-pill"> <%- data.data.post.likes.length %></span>
+                    <% } else{ %>
+                        <span class="badge badge-primary badge-pill"> 0</span>
+                    <% } %>
+                </div>
                 <hr class="my-4">
                 <h4 class="lead">Commentaires: </h4>
                 <% if( data.data.post.comments.length > 0 ) { %>
-                <ul class="list-group comments">
-                    <% for(let item of data.data.post.comments) { %>
-                    <li class="list-group-item">
-                        <p><%- item.text %></p>
-                        <p>Par : <%- item.author.givenName %></p>
-                    </li>
-                    <% } %>
-                </ul>
+                    <%- include('../components/comments', {datas : data.data.post.comments}) %>
                 <% } else { %>
                 <p>aucun commentaire</p>
                 <% } %>

@@ -63,7 +63,16 @@ Routes definition
                 }
                 else{
                     // Check body data
-                    const { ok, extra, miss } = checkFields( Mandatory[req.params.endpoint], req.body );
+                    if( req.params.endpoint == 'like'){
+                        // Add author _id
+                        req.body.author = req.user._id;
+
+                        // Use the controller to create nex object
+                        Controllers[req.params.endpoint].createOne(req)
+                        .then( apiResponse =>  res.redirect('/', req, res, 'Request succeed', apiResponse, true) )
+                        .catch( apiError => renderErrorVue('index', req, res, apiError,  'Request failed') )
+                    }else{
+                        const { ok, extra, miss } = checkFields( Mandatory[req.params.endpoint], req.body );
 
                     // Error: bad fields provided
                     if( !ok ){ return renderErrorVue('index', `/${req.params.endpoint}`, 'POST', res, 'Bad fields provided', { extra, miss }) }
@@ -76,11 +85,32 @@ Routes definition
                         .then( apiResponse =>  res.redirect('/', req, res, 'Request succeed', apiResponse, true) )
                         .catch( apiError => renderErrorVue('index', req, res, apiError,  'Request failed') )
                     }
+                    }
+                    
                 }
             })
 
+            this.router.post('/:endpoint/:id', this.passport.authenticate('jwt', { session: false, failureRedirect: '/' }), (req, res) => {
+                // Check body data
+                if( typeof req.body === 'undefined' || req.body === null || Object.keys(req.body).length === 0 ){ 
+                    return renderErrorVue('index', req, res, 'No data provided',  'Request failed')
+                }
+                else{
+                        const { ok, extra, miss } = checkFields( Mandatory[req.params.endpoint], req.body );
+
+                    // Error: bad fields provided
+                    if( !ok ){ return renderErrorVue('index', `/${req.params.endpoint}`, 'POST', res, 'Bad fields provided', { extra, miss }) }
+                    else{
+                        // Use the controller to create nex object
+                        Controllers[req.params.endpoint].updateOne(req)
+                        .then( apiResponse =>  res.redirect('/', req, res, 'Request succeed', apiResponse, true) )
+                        .catch( apiError => renderErrorVue('index', req, res, apiError,  'Request failed') )
+                    }
+                    }
+            })
+
             // [BACKOFFICE] Render GET detail vue
-            this.router.get('/:endpoint', async (req, res) => {
+            this.router.get('/:endpoint', this.passport.authenticate('jwt', { session: false, failureRedirect: '/' }), async (req, res) => {
                 if(req.params.endpoint == "post"){
                     await Controllers[req.params.endpoint].readAll()
                     .then(apiResponse => renderSuccessVue(`pages/${req.params.endpoint}List`, req, res, apiResponse, 'Request succeed', false))
@@ -91,7 +121,7 @@ Routes definition
             })
 
             // [BACKOFFICE] Render GET detail vue
-            this.router.get('/:endpoint/:id', async (req, res) => {
+            this.router.get('/:endpoint/:id', this.passport.authenticate('jwt', { session: false, failureRedirect: '/' }), async (req, res) => {
                 let data = {};
                 await Controllers[req.params.endpoint].readOne(req.params.id)
                     .then( post => data.post = post )
@@ -99,6 +129,27 @@ Routes definition
                 renderSuccessVue(`pages/${req.params.endpoint}`, req, res, data, 'Request succeed', false)
             })
 
+            // [BACKOFFICE] Render DELETE andpoint
+            this.router.get('/delete/:endpoint/:id', this.passport.authenticate('jwt', { session: false, failureRedirect: '/' }), async (req, res) => {
+                let data = {};
+                await Controllers[req.params.endpoint].deleteOne(req)
+                    .then( success =>  {
+                        res.redirect('/', req, res, 'Request succeed')
+                    })
+                    .catch( () => {
+                        res.redirect('/', req, res, 'Request failed')
+                    });
+            })
+
+            // [BACKOFFICE] Render EDIT detail vue
+            this.router.get('/edit/:endpoint/:id', this.passport.authenticate('jwt', { session: false, failureRedirect: '/' }), async (req, res) => {
+                let data = {};
+                await Controllers[req.params.endpoint].readOne(req.params.id)
+                    .then( post => data.post = post )
+                    .catch( () => renderErrorVue('post_error', req, res, null, 'Request failed'));
+                renderSuccessVue(`pages/edit-${req.params.endpoint}`, req, res, data, 'Request succeed', false)
+            })
+            
         }
 
         init(){
