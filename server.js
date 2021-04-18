@@ -31,11 +31,12 @@ class ServerClass{
             const origin = req.headers.origin;
 
             // Setup CORS
-            if(allowedOrigins.indexOf(origin) > -1){ res.setHeader('Access-Control-Allow-Origin', origin)}
+            if(allowedOrigins.indexOf(origin) > -1){
+                res.setHeader('Access-Control-Allow-Origin', origin)
+            }
             res.header('Access-Control-Allow-Credentials', true);
             res.header('Access-Control-Allow-Methods', ['GET', 'PUT', 'POST', 'DELETE', 'POST']);
-            res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-
+            res.header("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin, X-Requested-With, Content-Type, Accept, Authorization");
             // Use next() function to continue routing
             next();
         });
@@ -62,7 +63,6 @@ class ServerClass{
         // Set authentication
         const { setAutentication } = require('./services/auth.service');
         setAutentication(passport);
-
         // Set AUTH router
         const AuthRouterClass = require('./routers/auth.router');
         const authRouter = new AuthRouterClass( { passport } );

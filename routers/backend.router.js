@@ -33,6 +33,34 @@ Routes definition
                 renderSuccessVue('login', req, res, null, 'Request succeed', false)
             })
 
+            // [BACKOFFICE] Render login vue
+            this.router.get('/register', (req, res) => {
+                renderSuccessVue('pages/register', req, res, null, 'Request succeed', false)
+            })
+
+            // [BACKOFFICE] get data from client to log user and render index vue
+        this.router.post('/register', (req, res) => {
+
+            // Check body data
+            if (typeof req.body === 'undefined' || req.body === null || Object.keys(req.body).length === 0) {
+                return renderErrorVue('error', req, res, 'No data provided', 'Request failed')
+            }
+            else {
+
+                // Check body data
+                const { ok, extra, miss } = checkFields(Mandatory.register, req.body);
+
+                // Error: bad fields provided
+                if (!ok) { return renderErrorVue('index', '/register', 'POST', res, 'Bad fields provided', { extra, miss }) }
+                else {
+                    Controllers.auth.register(req, res)
+                        .then(apiResponse => renderSuccessVue('/', req, res, 'User registered', apiResponse, true))
+                        .catch(apiError => renderErrorVue('register', req, res, apiError, 'Request failed'));
+                }
+            }
+        })
+
+
             // [BACKOFFICE] get data from client to log user and render index vue
             this.router.post('/login', (req, res) => {
                 

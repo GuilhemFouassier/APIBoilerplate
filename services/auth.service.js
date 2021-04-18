@@ -11,7 +11,7 @@ Methods
     // Extract token from cookie
     const cookieExtractor = (req, res) => {
         let token = null;
-        if( req && req.cookies){ token = req.cookies[process.env.COOKIE_NAME] }
+        if( req && req.cookies){ console.log(req.cookies); token = req.cookies[process.env.COOKIE_NAME] }
         return token;
     }
 
@@ -22,13 +22,18 @@ Methods
             jwtFromRequest: cookieExtractor, 
             secretOrKey: process.env.JWT_SECRET
         }
-
         // JWT strategy
         passport.use(new JwtStrategy(opts, (jwtPayload, done) => {
             UserModel.findOne({ _id: jwtPayload._id }, (err, user) => {
-                if (err) { return done(err, false)}
-                if (user) { return done(null, user) }
-                else { return done(null, false) }
+                if (err) { 
+                    return done(err, false)
+                }
+                if (user) { 
+                    return done(null, user) 
+                }
+                else { 
+                    return done(null, false) 
+                }
             });
         })); 
     }

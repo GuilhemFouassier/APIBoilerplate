@@ -35,7 +35,7 @@ Routes definition
                     // Error: bad fields provided
                     if( !ok ){ return sendApiErrorResponse(req, res, { extra, miss }, 'Bad fields provided') }
                     else{
-                        Controllers.auth.register(req)
+                        Controllers.auth.register(req, res)
                         .then( apiResponse => sendApiSuccessResponse(req, res, apiResponse, 'Request succeed') )
                         .catch( apiError => sendApiErrorResponse(res, res, apiError, 'Request failed') );
                     }

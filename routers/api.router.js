@@ -67,6 +67,7 @@ Routes definition
             // [CRUD] define route to update one object, protected by Passport MiddleWare
             this.router.put('/:endpoint/:id', this.passport.authenticate('jwt', { session: false }), (req, res) => {
                 // Check body data
+                
                 if( typeof req.body === 'undefined' || req.body === null || Object.keys(req.body).length === 0 ){ 
                     return sendApiErrorResponse(req, res, null, 'No data provided in the reqest body')
                 }
@@ -75,7 +76,8 @@ Routes definition
                     const { ok, extra, miss } = checkFields( Mandatory[req.params.endpoint], req.body );
 
                     // Error: bad fields provided
-                    if( !ok ){  return sendApiErrorResponse(req, res, { extra, miss }, 'Bad fields provided') }
+                    if( !ok ){ 
+                        return sendApiErrorResponse(req, res, { extra, miss }, 'Bad fields provided') }
                     else{
 
                         // Use the controller to update data
