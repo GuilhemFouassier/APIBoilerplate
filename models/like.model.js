@@ -18,11 +18,11 @@ const MySchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'user'  
     },
-    posts: {
+    post: {
         type: Schema.Types.ObjectId,
         ref: 'post'  
     },
-    comments: {
+    comment: {
         type: Schema.Types.ObjectId,
         ref: 'comment'  
     }

@@ -32,7 +32,7 @@ CRUD methods
             // Mongoose population to get associated data
             Models.comment.find({parentItem: req.params.postId})
             .populate('author', [ '-password' ])
-            .populate('comments')
+            .populate('likes')
             .exec( (err, data) => {
                 if( err ){ return reject(err) }
                 else{ return resolve(data) }
@@ -45,6 +45,7 @@ CRUD methods
             // Mongoose population to get associated data
             Models.comment.findById( id )
             .populate('author', [ '-password' ])
+            .populate('likes')
             .exec( (err, data) => {
                 if( err ){ return reject(err) }
                 else{ return resolve(data) }
@@ -70,7 +71,7 @@ CRUD methods
 
     const deleteOne = req => {
         return new Promise( (resolve, reject) => {
-            // Get post by ID
+            // Get comment by ID
              Models.comment.findById( req.params.id )
              .populate('author', [ '-password' ])
             .then( comment => {

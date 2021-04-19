@@ -13,26 +13,27 @@
             <div class="jumbotron">
                 <h3 class="display-4">
                     <%- data.data.post.headline %>
+                    <% if (data.data.post.author._id.toString() === data.data.user._id.toString() ) {%>
                     <a href="/delete/post/<%- data.data.post._id %>" class="btn btn-danger">Delete</a>
                     <a href="/edit/post/<%- data.data.post._id %>" class="btn btn-warning">Edit</a>
+                    <% } %>
                 </h3>
                 <p>Par : <%- data.data.post.author.givenName %> - <%- data.data.post.creationDate %></p>
                 <p class="lead">
                     <%- data.data.post.body %>
                 </p>
                 <div>
-                    
-                    <%- include('../components/form-like', {id: data.data.post._id, model : 'post'}) -%>
-                    <% if( data.data.post.likes.length > 0 ) { %>
-                        <span class="badge badge-primary badge-pill"> <%- data.data.post.likes.length %></span>
-                    <% } else{ %>
-                        <span class="badge badge-primary badge-pill"> 0</span>
-                    <% } %>
+                    <%- include('../components/form-like', {id: data.data.post._id, model : 'post', user: data.data.user, likes: data.data.post.likes}) -%>
+                        <% if( data.data.post.likes.length > 0 ) { %>
+                            <span class="badge badge-primary badge-pill"> <%- data.data.post.likes.length %></span>
+                        <% } else{ %>
+                            <span class="badge badge-primary badge-pill"> 0</span>
+                        <% } %>
                 </div>
                 <hr class="my-4">
                 <h4 class="lead">Commentaires: </h4>
                 <% if( data.data.post.comments.length > 0 ) { %>
-                    <%- include('../components/comments', {datas : data.data.post.comments}) %>
+                    <%- include('../components/comments', {datas : data.data.post.comments, user : data.data.user }) %>
                 <% } else { %>
                 <p>aucun commentaire</p>
                 <% } %>

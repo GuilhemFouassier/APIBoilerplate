@@ -77,7 +77,9 @@ Routes definition
                     if( !ok ){ return renderErrorVue('index', '/Login', 'POST', res, 'Bad fields provided', { extra, miss }) }
                     else{
                         Controllers.auth.login(req, res)
-                        .then( apiResponse => renderSuccessVue( '/', req, res, 'User logged', apiResponse, true ) )
+                        .then( apiResponse => {
+                            renderSuccessVue( '/', req, res, 'User logged', apiResponse, true ) 
+                        })   
                         .catch( apiError => renderErrorVue('login', req, res, apiError,  'Request failed') );
                     }
                 }
@@ -86,15 +88,14 @@ Routes definition
             // [BACKOFFICE] get data from client to create object, protected by Passport MiddleWare
             this.router.post('/:endpoint', this.passport.authenticate('jwt', { session: false, failureRedirect: '/' }), (req, res) => {
                 // Check body data
-                if( typeof req.body === 'undefined' || req.body === null || Object.keys(req.body).length === 0 ){ 
+                if( typeof req.body === 'undefined' || req.body === null || Object.keys(req.body).length === 0 ){
                     return renderErrorVue('index', req, res, 'No data provided',  'Request failed')
                 }
                 else{
-                    // Check body data
-                    if( req.params.endpoint == 'like'){
+
+                    if(req.params.endpoint === 'like'){
                         // Add author _id
                         req.body.author = req.user._id;
-
                         // Use the controller to create nex object
                         Controllers[req.params.endpoint].createOne(req)
                         .then( apiResponse =>  res.redirect('/', req, res, 'Request succeed', apiResponse, true) )
@@ -102,20 +103,22 @@ Routes definition
                     }else{
                         const { ok, extra, miss } = checkFields( Mandatory[req.params.endpoint], req.body );
 
-                    // Error: bad fields provided
-                    if( !ok ){ return renderErrorVue('index', `/${req.params.endpoint}`, 'POST', res, 'Bad fields provided', { extra, miss }) }
-                    else{
-                        // Add author _id
-                        req.body.author = req.user._id;
+                        // Error: bad fields provided
+                        if( !ok ){
+                            return renderErrorVue('index', `/${req.params.endpoint}`, 'POST', res, 'Bad fields provided', { extra, miss }) }
+                        else{ 
+                            // Add author _id
+                            req.body.author = req.user._id;
+                            // Use the controller to create nex object
+                            Controllers[req.params.endpoint].createOne(req)
+                            .then( apiResponse =>  res.redirect('/', req, res, 'Request succeed', apiResponse, true) )
+                            .catch( apiError => renderErrorVue('index', req, res, apiError,  'Request failed') )
+                        }
+                    }
 
-                        // Use the controller to create nex object
-                        Controllers[req.params.endpoint].createOne(req)
-                        .then( apiResponse =>  res.redirect('/', req, res, 'Request succeed', apiResponse, true) )
-                        .catch( apiError => renderErrorVue('index', req, res, apiError,  'Request failed') )
-                    }
-                    }
                     
                 }
+                    
             })
 
             this.router.post('/:endpoint/:id', this.passport.authenticate('jwt', { session: false, failureRedirect: '/' }), (req, res) => {
@@ -150,11 +153,17 @@ Routes definition
 
             // [BACKOFFICE] Render GET detail vue
             this.router.get('/:endpoint/:id', this.passport.authenticate('jwt', { session: false, failureRedirect: '/' }), async (req, res) => {
-                let data = {};
+                let data ={
+                    post : '',
+                    user :  req.user
+                }
+                
                 await Controllers[req.params.endpoint].readOne(req.params.id)
-                    .then( post => data.post = post )
-                    .catch( () => renderErrorVue('post_error', req, res, null, 'Request failed'));
-                renderSuccessVue(`pages/${req.params.endpoint}`, req, res, data, 'Request succeed', false)
+                .then(apiResponse => {
+                    data.post = apiResponse
+                    renderSuccessVue(`pages/${req.params.endpoint}`, req, res, data, 'Request succeed', false)
+                })
+                .catch(apiError => renderErrorVue(`pages/${req.params.endpoint}List`, req, res, apiError, 'Request failed'))
             })
 
             // [BACKOFFICE] Render DELETE andpoint

@@ -1,4 +1,19 @@
-<form action="/like?model=<%= model  %>" method="POST">
-    <input type="text" name="<%= model  %>s" value="<%= id  %>" style="display: none;">
+<% var exist = false %>
+<% var idLike = '' %>
+<% for(item of likes) { %>
+    <%var string = "" + item.author %>
+    <% if(string === user._id.toString()) 
+        {
+            exist = true
+            idLike = item._id
+        }
+    %>
+<% } %>  
+<% if (exist === false) {%>
+<form action="/like" method="POST">
+    <input type="text" name="<%= model  %>" value="<%= id  %>" style="display: none;">
     <button type="submit" class="btn btn-primary btn-sm"><i class="bi bi-hand-thumbs-up"></i></button>
 </form>
+<% } else { %>
+    <a href="/delete/like/<%- idLike %>""> Delete like</a>
+<% } %>

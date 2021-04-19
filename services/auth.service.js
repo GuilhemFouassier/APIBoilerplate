@@ -11,7 +11,7 @@ Methods
     // Extract token from cookie
     const cookieExtractor = (req, res) => {
         let token = null;
-        if( req && req.cookies){ console.log(req.cookies); token = req.cookies[process.env.COOKIE_NAME] }
+        if( req && req.cookies){ token = req.cookies[process.env.COOKIE_NAME] }
         return token;
     }
 

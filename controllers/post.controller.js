@@ -36,7 +36,8 @@ CRUD methods
             .populate('author', [ '-password' ])
             .populate({
                 path: 'comments',  
-                populate: { path: 'author' }
+                populate: { path: 'author' },
+                populate: { path : 'likes'}
 
             })
             .populate('likes')

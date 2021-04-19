@@ -14,8 +14,8 @@ CRUD methods
                 .then(data => {
                     resolve(data);
                     // Si on possède un champs post
-                    if (data.posts != null) {
-                        Models[req.query.model].findById(data.posts)
+                    if (data.post != null) {
+                        Models.post.findById(data.post)
                             .then(post => {
                                 post.likes.push(data._id);
                                 post.save()
@@ -23,9 +23,9 @@ CRUD methods
                                     .catch(updateError => reject(updateError))
                             })
                             .catch(err => reject(err))
-                    } else {
+                    } else if (data.comment != null) {
                         // Sinon on possède un champs comment
-                        Models[req.query.model].findById(data.comments)
+                        Models.comment.findById(data.comment)
                             .then(comments => {
                                 comments.likes.push(data._id);
                                 comments.save()
@@ -67,27 +67,51 @@ CRUD methods
         })
     }
 
-    const deleteOne = data => {
+    const deleteOne = req => {
         return new Promise( (resolve, reject) => {
-             // Get comment by ID
-             Models.like.findByIdAndDelete( data._id, (err, deleted) => {
-                if( err ){ 
-                    return reject(err)
+             // Get Like by ID
+             Models.like.findById( req.params.id )
+             .populate('author', [ '-password' ])
+            .then( data => {
+                if( `${req.user._id}` !== `${data.author._id}` ){
+                    return reject('User not authorized') 
                 }
                 else{
-                    Models.post.findById(data.posts)
-                    .then( post => {
-                        // Delete Comment Id
-                        post.likes.pull(data._id) ;
-                        // Save post changes
-                        post.save()
-                        .then( updatedPost => resolve(updatedPost) )
-                        .catch( updateError => reject(updateError) )
-                    })
-                    .catch( err => reject(err) )
-                    return resolve(deleted) 
+                    Models.like.findByIdAndDelete( req.params.id, (err, deleted) => {
+                    if( err ){ 
+                        return reject(err)
                     }
-                })
+                    else{
+                        if(data.post){
+                            Models.post.findById(data.post)
+                        .then( post => {
+                            // Delete Comment Id
+                            post.likes.pull(data._id) ;
+                            // Save post changes
+                            post.save()
+                            .then( updatedPost => resolve(updatedPost) )
+                            .catch( updateError => reject(updateError) )
+                        })
+                        .catch( err => reject(err) )
+                        }else if(data.comment){
+                            Models.comment.findById(data.comment)
+                        .then( comment => {
+                            // Delete Comment Id
+                            comment.likes.pull(data._id) ;
+                            // Save post changes
+                            comment.save()
+                            .then( updatedPost => resolve(updatedPost) )
+                            .catch( updateError => reject(updateError) )
+                        })
+                        }
+                        
+                        
+                        return resolve(deleted) 
+                        }
+                    })
+                }
+            })
+            .catch( err => reject(err) ); 
         });
     }
 //
